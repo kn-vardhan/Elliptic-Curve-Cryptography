@@ -1,0 +1,13 @@
+
+https://www.researchgate.net/publication/322558426_RSA_and_ECC_A_comparative_analysis
+http://www.umsl.edu/~siegelj/information_theory/projects/EllipticCurveEncyiption.pdf
+https://www.researchgate.net/publication/265945652_A_Discussion_on_Elliptic_Curve_Cryptography_and_Its_Applications
+https://csrc.nist.gov/CSRC/media/Events/Key-Management-Workshop-2001/documents/p1363.pdf
+https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+https://sectigo.com/resource-library/rsa-vs-dsa-vs-ecc-encryption#:~:text=The%20biggest%20difference%20between%20ECC,key%20of%20the%20same%20size.
+https://www.ripublication.com/ijaer17/ijaerv12n19_140.pdf
+https://ijcert.org/ems/ijcert_papers/V3I1101.pdf
+https://koclab.cs.ucsb.edu/teaching/ecc/project/2015Projects/Levy.pdf
+https://csrc.nist.gov/csrc/media/events/workshop-on-elliptic-curve-cryptography-standards/documents/papers/session6-adalier-mehmet.pdf?ref=blog.cloudflare.com
+https://koclab.cs.ucsb.edu/teaching/ecc/project/2015Projects/Vasudevan.pdf
+https://www.internetsociety.org/deploy360/tls/basics/#:~:text=For%20this%20reason%2C%20TLS%20uses,the%20session%20key%20is%20discarded.
