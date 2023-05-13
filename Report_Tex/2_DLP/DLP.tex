@@ -1,0 +1,141 @@
+\chapter{The Discrete Logarithm Problem}\label{chap:dlp}
+\section{Classical Discrete Logarithm Problem}
+Let $p$ be a prime. Let $a, b \in \mathbb{Z}$, $a\pmod{p} \neq 0$ , $b\pmod{p} \neq 0$. Suppose there exists $k \in \mathbb{Z}$ such that,
+\[ a^k \equiv b \pmod{p}\]
+The Classical Discrete problem is to find the $k$ that satisfies the above condition. 
+
+\section{Discrete Logs on Elliptic Curves}
+Let us consider the group $E(\mathbb{F}_q)$ for some elliptic curve $E$ over finite field $\mathbb{F}_q$. Let $a, b \in E$. Then the discrete logarithm problem is to find an integer $k$ such that
+\[ka = b\]
+
+\section{General Attacks on Discrete Logs}
+We can attack a discrete log problem by using a simple brute force method - trying all possible values of $k$ until one satisfies the condition. However this method is very impractical and expensive as $k$ can be of very huge size (several hundred digits). Below are a few methods that can be used to solve the discrete log problem in a more practical way.
+
+\par We consider the group: an Elliptic curve $E$ over the field $\mathbb{F}_q$ with order $N$. We are given the points $P, Q \in E(\mathbb{F}_q)$ and we trying to solve:
+\[kP = Q\]
+We assume that such k exists.
+
+\subsection{Baby Step, Giant Step}
+This method was developed by D. Shanks. \\
+It requires approximately $\sqrt{N}$ steps and around $\sqrt{N}$ storage. \cite{Washington:book:2008}
+%% Algorithm taken from tetxbook
+\begin{algorithm}
+\caption{Baby Step, Giant Step method to find $k$}\label{BSGS_DLP}
+\begin{algorithmic}[1]
+\Procedure{bsgsdlp}{$P, Q$}\Comment{Find $k$ such that, $kP = Q$}
+\State choose integer $m$ such that $m \geq \sqrt{N}$ 
+\State compute mP
+\For{$i=0$ to $m-1$}
+\State compute and store $iP$
+\EndFor
+\For{$j=0$ to $m$-1}
+\State compute $Q - jmP$
+\If{$Q - jmP = ip$}
+\State $k \gets (i + jm)\pmod{N}$
+\State break 
+\EndIf
+\EndFor
+\State \textbf{return} $k$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Correctness of Baby Step, Giant Step Method}
+We know that $m^2 \geq N$ \\
+Let $0 \leq k \leq m^2$ and let $k_0$ be an integer such that $0 \leq k_0 < m$ and $k \equiv k_0 \pmod m$ \\
+let $k_1 = (k-k_0)/m$ $\implies k_1 < (m^2 - 0)/m \implies 0 \leq k_1 < m$ \\
+In step-8 of the above algorithm let $j = k_1$
+\[ Q - k_1mP = kP - k_1mP = (k - k + k_0)P = k_0P \]
+Therefore when $j = k_1$ and $i = k_0$ , There is a match\\
+\textit{Note:} We were able to substitute $Q$ with $kP$ because we have assumed that such $k$ exists.
+
+%% Below papers give time complexity for pollard's rho method (advanced stuff) `
+%% https://www.researchgate.net/publication/220576439_On_random_walks_for_Pollard's_rho_method
+%% https://www.diva-portal.org/smash/get/diva2:1326270/FULLTEXT01.pdf
+
+\subsection{Pollard's $\rho$ Method}
+We first choose a positive integer $s$ and divide the elliptic curve into $s$ disjoint subsets $S_1, S_2, ..., S_s$ of approximately same size.\\
+We then choose $2s$ random integers $a_i, b_i \pmod N$. Let
+\[M_i = a_iP + b_iQ \quad \forall i \in \{1,2,...,s\}\].
+We define $f:E(\mathbb{F}_q) \rightarrow E(\mathbb{F}_q)$ such that,
+\[f(g) = g + M_i \quad if \quad g \in S_i\]
+We start with a random point $P_0$ and compute the iterations $P_{i+1} = f(P_i)$. We also need to keep track of how the points are expressed in terms of $P$ and $Q$. Since $E(\mathbb{F}_q)$ is a finite set, there will be some indices $i_0 < j_0$ such that $P_{i_0} = P_{j_0}$. Let,
+\begin{align*}
+    P_{i_0} = u_{i_0}P + v_{i_0}Q\\
+    P_{j_0} = u_{j_0}P + v_{j_0}Q
+\end{align*}
+Therefore,
+\begin{align*}
+    u_{j_0}P + v_{j_0}Q &= u_{i_0}P + v_{i_0}Q \\
+    ( u_{i_0} - u_{j_0})P &= (v_{j_0} - v_{i_0})Q  
+\end{align*}
+let $\gcd((v_{j_0} - v_{i_0}), N) = d$, then we have
+\[k \equiv (v_{j_0} - v_{i_0})^{-1}( u_{i_0} - u_{j_0}) \pmod{N/d} \]
+This gives us d choices for $k$, Usually $d$ will be small, so we try all possibilities until we have $Q = kP$. \pagebreak
+
+\begin{algorithm}
+\caption{Pollard's $\rho$ Method to find $k$}\label{P_rho}
+\begin{algorithmic}[1]
+\Procedure{prho}{$P, Q$}\Comment{Find $k$ such that, $kP = Q$}
+\State choose integer $s$ 
+\For{$i=0$ to $s-1$}
+\State choose random integers $a_i$, $b_i \pmod N$
+\State $M_i \gets a_iP + b_iQ$
+\EndFor
+\State choose random integers $a_0 , b_0 \pmod N$
+\State $P_0 \gets a_0P + b_0Q$
+\For{$n=0$ to $N-1$}
+\State $f(P_n) \gets P_n + M_{j}$\Comment{if $x$ is the x-coordinate of $P_n$, then $x \equiv j \pmod s$ }
+\State $P_{n+1} \gets f(P_n)$\Comment{also store $u_{n+1}, v_{n+1}$ s.t $P_{n+1} = u_{n+1}P + v_{n+1}Q $}
+\If{$P_{n+1} = P_j$} \Comment{For some $j$ in $1$ to $n$}
+\State $k \gets (v_j - v_{n+1})^{-1}( u_{n+1} - u_{j})\pmod{N}$
+\State break 
+\EndIf
+\EndFor
+\State \textbf{return} $k$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+The above implementation takes around $\sqrt{N}$ storage which is similar to Baby Step, Giant step Method. R. W. Floyd found an algorithm that does much better at the cost of a little more computation.\\
+The key idea is the compute pairs $(P_i, P_{2i})$ for $i = 1,2,...,$ but only store the current pair. Calculated by the rules:
+\[P_{i+1} = f(P_i), \quad P_{2(i+1)} = f(f(P_{2i}))\]
+We know that once if there's a match for two indices differing by d, all subsequent indices differing by d will yield matches.\\
+Let $P_{i_0} = P_{j_0}$ and $(j_0 - i_0) = d$, let $i$ be a multiple of $d$ and $i_0 \leq i \leq j_0$. then the indices $i, 2i$ differ by $d$ and hence yield a match.
+\subsubsection{Time Complexity} 
+For a random function $f$, the tail and cycle length of the "rho" is $\sqrt{\frac{\pi N}{8}}$, and the proof can be found here $^{\cite{Rho:2001}}$.
+So, the time complexity will be $O(\sqrt{N})$. 
+
+\subsection{Pohlig-Hellman Method}
+Let $N$ be the order of $P$ , and the prime factorization of $N$,
+\[N = \prod_{i}q_{i}^{e_i}\]
+We find $k\pmod{q_i^{e_i}}$ for each $i$ using the algorithm below and then use Chinese Remainder theorem to combine these and obtain $k\pmod N$.
+\begin{algorithm}
+\caption{Pohlig-Hellman Method to find $k \pmod {q^e}$}\label{PH}
+\begin{algorithmic}[1]
+\Procedure{Pohlig-Hellman}{$P, Q$}
+\State Compute $T = \{j(\frac{N}{q}P) \mid 0\leq j \leq q-1\}$
+\State Compute $\frac{N}{q}Q$
+\State find $k_0$ such that  $\frac{N}{q^{r}}Q = k_0(\frac{N}{q}P)$
+\For{$r=1$ to $e-1$}
+\State $Q_r = Q_{r-1} - k_{r-1}q^{r-1}P$
+\State Find $k_r$ such that $\frac{N}{q^{r+1}}Q_r = k_r(\frac{N}{q}P)$
+\EndFor
+\State $k \gets (k_0 + k_1q + ... + K_{e-1}q^{e-1}) \pmod{q^e}$
+\State \textbf{return} $k$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+\subsubsection{Correctness of Pohlig-Hellman Method}
+The base $q$ expansion of $k$ is $k_0 + k_1q + k_2q^2 + ...$ \\
+In step-3:
+\begin{align*}
+    \frac{N}{q}Q &= \frac{N}{q}(k_0 + q(k_1 + k_2q + ....))P\\
+                 &= k_0\frac{N}{q}P + (k_1 + k_2q+...)NP = k_0\frac{N}{q}P
+\end{align*}
+
+\noindent Therefore in Step-4 we find $k_0$\\
+Similarly in Steps 5 to 8 we find $k_1, k_2,...k_{e-1}$ (We do not go beyond $e-1$ as we are finding the value $k \pmod{q^e}$ and thus all those values will be 0)\\
+In Step-6 we compute $k \pmod{q^e}$ using its expansion in base $q$
+\subsubsection{Time Complexity}
+The research paper $^{\cite{Rosen:2007}}$ suggests that the time complexity is  $O(\sqrt{N})$. 

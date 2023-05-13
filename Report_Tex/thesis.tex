@@ -1,0 +1,35 @@
+\documentclass[department=math,degree=btech, book = report, backref=page,spacing=onehalf]{iiththesis}
+
+\title{Elliptic Curve Cryptography}
+\submitted{\today}
+\author{Anita Dash, Kethari Narasimha Vardhan, Tata Sai Manoj}
+\rollno{MA20BTECH11001, MA20BTECH11006, MA20BTECH11010}
+\adviser{Dr. Pradipto Banerjee}
+\addradviser{Dept. of \department \\ \iithfull}
+
+\usepackage{import}
+\import{common/}{preamble}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Include specific chapters while preserving the chapter number.
+%% Abstract must always be added.
+\renewcommand{\bibname}{References}
+\begin{document}
+\include{1_Introduction/introduction}
+\include{chapter-1/chapter-1}
+\include{2_DLP/DLP}
+\include{3_Comparisons/comparisions}
+\include{4_Pairings/weilpairing}
+\include{5_Applications/bitcoin}
+\include{5_Applications/secure}
+
+\clearpage
+\newpage
+\phantomsection\addcontentsline{toc}{chapter}{References} % Please do not remove this
+\nocite{*}
+\bibliographystyle{iiththesis}
+\bibliography{common/references}
+
+%\printindex
+\end{document}

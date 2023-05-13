@@ -1,0 +1,223 @@
+\chapter{Cryptography}\label{chap:ecc_comparsions}
+
+\section{Introduction}
+Cryptography, as we see it, is the study of having secure communication from outsider observers.
+It includes three main aspects in it, key generation, encryption algorithm, and decryption algorithm, and the combination is called a cryptosystem.
+The main objective includes Confidentiality, Non-repudiation, Integrity, and Authenticity. 
+The study of cryptography began with ciphers which are still the building blocks for modern-day cryptosystems.
+The current cryptosystems and their algorithms are much more complex and use multiple rounds of ciphers to encrypt the message securely. 
+We have two major cryptosystems, namely symmetric (private key) and asymmetric (public key).
+In this paper, we are going to discuss and compare various algorithms in asymmetric cryptosystems, while majorly focusing on the Elliptic Curve Cryptosystem. A few examples of asymmetric cryptosystems include
+
+\begin{itemize}
+    \itemsep0em
+    \item RSA (Rivest-Shamir-Adleman)
+    \item ECC (Elliptic Curve Cryptography)
+    \item Diffie-Hellman Key Exchange
+    \item ElGamal Key Exchange
+    \item Digital Signature Algorithm
+    \item Key Serialization
+\end{itemize}
+
+\section{History of Asymmetric Cryptosystems}
+One of the most classical examples of asymmetric cryptography first published in 1977 by three scientists Ron Rivest, Adi Shamir and Leonard Adleman of the Massachusetts Institute of Technology, is the RSA.
+Since then, this cryptosystem has bloomed exponentially. Lately, as the power of computers has increased and become vulnerable to modern technology attacks, cryptographers have started to look out for stronger encryption-decryption schemes.
+Here's when the Elliptic Curve Cryptography came into the picture. While the RSA system is mainly built over the integer factorization problem, the ECC system is built on the difficulty in solving the Discrete Logarithm Problem on Elliptic Curves.
+Various cryptoanalysts are predicting that ECC will be overtaking RSA completely as the scalability of RSA is looming. 
+The major reason for this shift is acquiring the same level of security with less memory, less time, and more efficiency.
+The researchers have claimed that the security that 1024-bit RSA provides, can be provided by ECC in just 164-bit.
+Another great addition to the ECC is that it is highly scalable and can be used in conjunction with other asymmetric schemes such as DSA, Diffie-Hellman, ElGamal, etc. 
+ECC is \textbf{FIPS-certified} and is also endorsed by the National Security Agency (NSA). \newline
+
+\par
+\noindent A small glimpse of how ECC is better in comparison to the classical RSA can be seen in Table 3.1 above. An RSA of 1024-bit length used to be secure but is no longer considered secure. There are recent claims from Chinese researchers that the 2048-bit RSA could be cracked using their algorithm. Therefore, it is high time to shift to ECC from RSA. It is also to be noted that the shorter key lengths mean devices require less processing power to encrypt and decrypt data, making ECC a good fit for mobile devices, the Internet of Things, and other use cases with more limited computing power.
+
+\begin{table}[]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+RSA Key size (in bits) & ECC Key size (in bits) \\ \hline
+1024 & 160 \\ \hline
+2048 & 224 \\ \hline
+3072 & 256 \\ \hline
+7680 & 384 \\ \hline
+15360 & 521 \\ \hline
+\end{tabular}
+\label{table:1}
+\caption{Key Comparison between RSA and ECC}
+\end{table}
+
+\section{Encryption-Decryption Schemes}
+ECC is replacing RSA and various other asymmetric cryptographic schemes due to its various advantages and scalability. Here, we try to look at how ECC is used in conjunction with Massey-Omura, Diffie-Hellman, ElGamal, and DSA. \newline
+We now discuss various encryption-decryption schemes involving Elliptic Curves.
+
+
+\subsection{Diffie-Hellman Key Exchange}
+It is a mathematical method of exchanging cryptographic keys and is one of the earliest practical examples of public key exchanges implemented in the field of cryptography.
+The main difference between DH (Diffie-Hellman) and ECDH (Elliptic Curve Diffie-Hellman) is the group that is being chosen to compute the secret key(s). While the regular Diffie-Hellman uses a multiplicative group of integers modulo a prime $p$, the Elliptic Curve Diffie-Hellman uses a multiplicative Abelian group of points of an Elliptic Curve over field $F_q$. \newline
+
+\noindent Let us take Alice and Bob who wish to communicate;\newline
+\noindent (Note: $G$ is the generator point of the curve with order $n$)
+
+\begin{algorithm}
+\caption{Elliptic Curve Diffie-Hellman}\label{ECDH}
+\begin{algorithmic}[1]
+\Procedure{ECDH}{$C, G$}\Comment{$C: y^2=x^3 + ax + b\:(F_q)$}
+\State $A$ chooses a private key $1 \leq k_A \leq n-1 $
+\State $B$ chooses a private key $1 \leq k_B \leq n-1 $
+\State Compute $P_A = k_AG$ and share with $B$
+\State Compute $P_B = k_BG$ and share with $A$
+\State $A$ computes $P_{AB} = k_A(k_BG)$
+\State $B$ computes $P_{BA} = k_B(k_AG)$
+\State \textbf{return} $P_{AB}$ or $P_{BA}$\Comment{Shared private key}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\noindent We try to check the time complexity of the above algorithm. 
+\\Steps 2, 3 take $O(1)$ time as we generate integers $1 \leq k_A, k_B \leq n - 1$.
+\\Steps 4, 5, 6, 7 take $O(N^{k+1})$ time as the point multiplication depends on the multiplication algorithm used, where $N$ is the bit length of prime $n$. Therefore, the time complexity for ECDH is
+\begin{center}
+T.C = $O((log\:n)^{k+1})$
+\end{center}
+
+\noindent However, please note that the ECDH time complexity might vary depending on the specific algorithms used and how they are implemented in the intermediate steps.
+
+\subsection{Massey Omura Algorithm}
+This is an encryption scheme created in 1982 by two scientists James Massey and Jim K. Omura. As mentioned earlier, every cryptosystem has three main components; key generation, encryption algorithm, and decryption algorithm. Here, we discuss all three components in this cryptosystem in conjunction with Elliptic Curves.
+This procedure works in any finite group. And is very similar to the Diffie-Hellman problem earlier.
+
+\noindent Note: $N = \#E(F_q)$ and the message $M$ is expressed as a point on the curve $C$.
+\begin{algorithm}
+\caption{Massey Omura Algorithm}\label{massey-omura}
+\begin{algorithmic}[1]
+\Procedure{MasseyOmura}{$C, M$}\Comment{$C: y^2=x^3 + ax + b\:(F_q)$}
+\State $A$ chooses private key $gcd(m_A, N) = 1$
+\State Compute $M_1 = m_AG$ and send to $B$
+\State $B$ chooses private key $gcd(m_B, N) = 1$
+\State Compute $M_2 = m_B(M_1)$ and send to $A$
+\State $A$ computes $M_3 = m_A^{-1}M2$ and sends to $B$
+\State $B$ computes $M_4 = m_B^{-1}M_3$
+\State \textbf{return} $M_4$\Comment{Message to Bob from Alice}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\noindent As we can see, the Massey Omura Algorithm is very similar to the ECDH method, except that, here we take the point $M$ instead of the generator point $G$. \newline
+
+\par
+\noindent Similar to the earlier case, the time complexity for the Massey Omura Algorithm is
+\begin{center}
+    T.C = $O((log\:n)^{k+1})$
+\end{center}
+
+\subsection{ElGamal Encryption Scheme}
+The first-ever public key encryption scheme builds over the Diffie-Hellman key exchange is the ElGamal system. And the more powerful one is the Integrated Encryption Scheme.
+ElGamal encryption can produce multiple ciphertexts for a single plaintext, which makes it a probabilistic encryption scheme. As a result, the size of the ciphertext is usually twice the size of the plaintext, resulting in a 1:2 expansion ratio.
+
+\noindent
+In general ElGamal encryption, modular arithmetic is used to generate the ciphertext, while in ECC-based ElGamal encryption, elliptic curve arithmetic is used instead.
+\newpage
+
+\noindent The algorithms for encryption and decryption are as follows:
+\newline
+\noindent Note: Before encryption-decryption, a public key is set up by Bob to Alice
+\begin{center}
+$Q = dG$, where $1 \leq d \leq n-1$ is a private key of Bob.
+\end{center}
+
+\begin{algorithm}
+\caption{ElGamal Encryption}\label{elgamal-encrypt}
+\begin{algorithmic}[1]
+\Procedure{Encrypt}{$C, M, G, Q$}\Comment{Alice encrypts message}
+\State Choose a random number $1 \leq k \leq n-1$
+\State Compute ciphertext $C_1 = kG$
+\State Compute ciphertext $C_2 = M + kQ$
+\State \textbf{return} $C_1, C_2$\Comment{Encrypted text to Bob}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{ElGamal Decryption}\label{elgamal-decrypt}
+\begin{algorithmic}[1]
+\Procedure{Decrypt}{$C, C_1, C_2$}
+\State Compute plain text $M = C_2 - dC_1$
+\State \textbf{return} $M$\Comment{Message to Bob from Alice}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\noindent Similar to the earlier cases, the time complexities of encryption and decryption in ElGamal are
+\begin{center}
+    T.C = $O((log\:n)^{k+1})$ for encryption \\
+    T.C = $O((log\:n)^{k+1})$ for decryption
+\end{center}
+
+\subsection{Elliptic Curve Digital Signature Algorithm}
+ECDSA (Elliptic Curve Digital Signature Algorithm) is a digital signature algorithm based on elliptic curve cryptography. It is a variant of the Digital Signature Algorithm (DSA) that uses elliptic curve cryptography instead of finite field arithmetic.
+ECDSA allows a signer to sign a message using their private key, and anyone with access to their public key can verify the authenticity of the signature. Additional to the key generation, encryption, and decryption algorithms, ECDSA also uses a hash function to securely hash the message. \newline
+
+\par
+\noindent Note: Generally, a hash function such as SHA-256 or SHA-384 is used in ECDSA. And before signing-verifying, a public key is set up by Bob to Alice, 
+\begin{center}
+$Q = dG$, where $1 \leq d \leq n-1$ is a private key of Bob.
+\end{center}
+
+\begin{algorithm}
+\caption{ECDSA Sign}\label{ECDSA_sign}
+\begin{algorithmic}[1]
+\Procedure{Sign}{$C, M, G, Q$}\Comment{Alice signs the message}
+\State $L_n = $ bit length of $n$
+\State Compute hash, $h = HASH(M)$
+\State Compute $z_n = L_n$ left most bits of $h$
+\While {$r \neq 0$ and $s \neq 0$}\Comment{$(r, s)$ to be a valid signature}
+\State Choose private key $1 \leq k \leq n-1$
+\State Compute $(x_1, y_1) = kG$
+\State Compute $r \equiv x_1\:(mod\:n)$ and $s \equiv k^{-1}(z + rd)\:(mod\:n)$
+\EndWhile
+\State \textbf{return} $(r, s)$\Comment{Signature sent to recipient}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{ECDSA Verify}\label{ECDSA_verify}
+\begin{algorithmic}[1]
+\Procedure{Verify}{$C, M, G, r, s$}\Comment{Bob verifies signed message}
+\If{$r, s$ do not lie in $[1, n-1]$}
+\State \textbf{return} Invalid signature
+\EndIf
+\State $L_n = $ bit length of $n$
+\State Compute hash, $h = HASH(M)$\Comment{Produces same hash}
+\State Compute $z_n = L_n$ left most bits of $h$
+\State Compute $u_1 \equiv z_ns^{-1} \: (mod \: n)$
+\State Compute $u_2 \equiv rs^{-1} \: (mod \: n)$
+\State Compute $(x_1, y_1) = u_1G + u_2Q$
+\If{$(x_1, y_1) = \infty$}
+\State \textbf{return} Invalid signature
+\EndIf
+\State Compute $v \equiv x_1 \: (mod \: n)$
+\If {$v \neq r$}
+\State \textbf{return} Valid Signature
+\EndIf
+\State \textbf{return} Invalid Signature
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\noindent This algorithm offers many advantages for SSH, such as being faster and more secure than RSA and DSA for signing due to its smaller keys (usually 256 or 384 bits). 
+Additionally, ECDSA is more resistant to quantum attacks as the quantum algorithms for breaking elliptic curves are less efficient than those for breaking factoring and discrete logarithms. 
+
+\subsubsection{Time Complexity}
+\par
+\noindent The time complexity for ECDSA can be estimated as ($N$ is the bit length of the prime number used in generating the curve)
+\begin{center}
+    Key Generation: $O(N^2)$ \\
+    Signature Generation: $O(N^3)$ or $O(N^4)$\\
+    Signature Verification: $O(N^3)$ or $O(N^4)$
+\end{center}
+\noindent The above complexity depends on the algorithm used to find the scalar multiplication and the way it is implemented. Therefore, approximating bit length as $log \: n$ where n is the prime number chosen for the field, the time complexity is
+\begin{center}
+    $O((log\:n)^{k+1}); \qquad k = 2/3$
+\end{center}
